@@ -1,0 +1,134 @@
+﻿
+<style>
+    .specimg {
+        text-align: center;
+        width: 40%;
+        height: 200px;
+        border-radius: 50%;
+        border:1px solid gray;
+    }
+    .content {
+        align-items: center;
+        text-align: -webkit-center;
+    }
+</style>
+<script type="text/javascript">
+$(document).on("click", ".specialist-modal", function () {
+    debugger;
+
+                var sender = $(this).attr("sender");
+                var sepcialist = $(this).attr("specialist");
+                $.ajax({
+                    url: "@Url.Action("Modal", "UserManager")",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    data: JSON.stringify({Id:sepcialist }),
+                    success: function (result) {
+                    if (result.Status == true) {
+                    debugger;
+                    $('#name').text(result.Tempmodel.Name);
+                    $('#occupation').text(result.Tempmodel.occupation);
+                    $('#address').text(result.Tempmodel.Address);
+                    $('#city').text(result.Tempmodel.City + "," + result.Tempmodel.State);
+                        var imgurl = "../../Uploads/"+ result.Tempmodel.imgurl;
+                        $('#spec-img').attr("src", imgurl);
+                        $('.specimg').css({ 'background-image': 'url('+imgurl+')'});
+                    $('#spec-id').attr("value", result.Tempmodel.Id);
+                    }
+                    },
+                    });
+});
+
+    $(document).on("click", "#send-appointment", function () {
+        debugger;
+        $('.loader-div').show();
+        var model = new Object();
+        model.SenderId = $('.specialist-modal').attr("sender");
+        model.SpecialistId = $('#spec-id').attr("value");
+        model.AppointmentDate = $('#date').val();
+        model.AppointmentTime = $('#time').val();
+        $.ajax({
+            url: '@Url.Action("SendAppointment", "UserManager")',
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            processData: false,
+            data: JSON.stringify({ model }),
+            success: function (result) {
+                debugger;
+                if (result.Status == true) {
+                    $('.loader-div').hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved',
+                        text: result.Message,
+                        //footer: '<a href>Why do I have this issue?</a>'
+                    })
+                    $(".close").click();
+                }
+                else {
+                    $('.loader-div').hide();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: result.Message,
+                        //footer: '<a href>Why do I have this issue?</a>'
+                    })
+                    $('.close').click();
+                }
+            },
+        });
+    });
+</script>
+<div class="modal fade" id="specialistModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Specialist Profile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <div class="specid" hidden>
+                        <label id="spec-id" value=""></label>
+                    </div>
+                    <div class="specimg" style="text-align:center">
+                        
+                    </div>
+                    <div class="details" style="text-align:center">
+                        <div class="name">
+                            <label id="name" style="color:#0065EC;"></label>
+                        </div>
+                        <div class="occupation">
+                            <label id="occupation" style="color: #42C6FF;"></label>
+                        </div>
+                        <div class="address">
+                            <label id="address" style="color: #42C6FF;"></label>
+                        </div>
+                        <div class="city">
+                            <label id="city" style="color: #42C6FF;"></label>
+                        </div>
+                        <div class="date">
+                            <label style="color: #42C6FF;">Choose Appointment Date</label>
+                            <input type="date" id="date" value="" />
+
+                        </div>
+                        <div class="time">
+                            <label id="city" style="color: #42C6FF;">Choose Time</label>
+                            <input type="time" id="time" value="" />
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="send-appointment" class="btn btn-primary">Send Appointment Request</button>
+            </div>
+        </div>
+    </div>
+</div>

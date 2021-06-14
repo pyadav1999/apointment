@@ -1,0 +1,367 @@
+﻿@using apointment.Models
+@model dynamic
+
+@{
+    int i = 1;
+    double rated = 0;
+
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UserProfile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>*@
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+
+        body {
+            background-image: url('../../Content/images/Home Page.png');
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: none;
+            }
+        /*###navbar###*/
+        .navhead {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .appoint {
+            color: #0065EC;
+        }
+
+        .com {
+            color: #42C6FF;
+        }
+
+        .navbar-collapse {
+            flex-grow: unset;
+        }
+
+        .navbar-light .navbar-nav {
+            float: right;
+        }
+
+            .navbar-light .navbar-nav .nav-link {
+                color: #001350;
+                font-size: 20px;
+                font-weight: normal;
+            }
+
+            .navbar-light .navbar-nav .nav-item {
+                margin-left: 50px;
+            }
+
+        .sub-menu-parent {
+            position: relative;
+            margin-top: 3%;
+        }
+
+            .sub-menu-parent a {
+                font-size: 18px;
+                color: inherit;
+            }
+
+        .sub-menu li {
+            border-bottom: 1px solid lightgray;
+        }
+
+        .sub-menu {
+            visibility: hidden; /* hides sub-menu */
+            opacity: 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 120px;
+            transform: translateY(-2em);
+            z-index: -1;
+            transition: all 0.3s ease-in-out 0s, visibility 0s linear 0.3s, z-index 0s linear 0.01s;
+        }
+
+        .sub-menu-parent:focus .sub-menu,
+        .sub-menu-parent:focus-within .sub-menu,
+        .sub-menu-parent:hover .sub-menu {
+            visibility: visible; /* shows sub-menu */
+            opacity: 1;
+            z-index: 1;
+            transform: translateY(0%);
+            transition-delay: 0s, 0s, 0.3s; /* this removes the transition delay so the menu will be visible while the other styles transition */
+        }
+
+        nav ul,
+        nav ul li {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav > ul {
+            background: #EEE;
+            text-align: center;
+        }
+
+            nav > ul > li {
+                display: inline-block;
+                border-left: solid 1px #aaa;
+            }
+
+                nav > ul > li:first-child {
+                    border-left: none;
+                }
+
+        .sub-menu {
+            background-color: background: rgb(255,255,255);
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(0,212,255,1) 100%, rgba(9,9,121,1) 100%);
+        }
+
+        .loader {
+            top: 40%;
+            left: 45%;
+            position: fixed;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid blue;
+            border-right: 16px solid green;
+            border-bottom: 16px solid red;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        .loader-div {
+            left: 0;
+            position: fixed;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0,0,0,0.4) !important;
+            z-index: 10001;
+        }
+
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .checked {
+            color: orange;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.loader-div').hide();
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#users tr").filter(function () {
+                    $(this).toggle($(this).text()
+                        .toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            $(".all").click(function () {
+                $("#users").find("tr").show();
+                
+            });
+               
+            $(".doctor").click(function () {
+                var rows = $("#users").find("tr").hide();
+                rows.filter(":contains('Doctor')").show();
+            });
+            $(".engineer").click(function () {
+                var rows = $("#users").find("tr").hide();
+                rows.filter(":contains('Engineer')").show();
+            });
+            $(".plumber").click(function () {
+                var rows = $("#users").find("tr").hide();
+                rows.filter(":contains('Plumber')").show();
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light ">
+        <div class="container">
+            <h2 class="navhead">
+                <a href="@Url.Action("Index", "Home")"><span class="appoint">Appoint</span><span class="com">.com</span></a>
+            </h2>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <span class="user_img"><img style="width:50px;height:50px;border-radius:50%;" src="@Url.Content(ViewBag.ImgUrl)" /></span>
+                        <span class="user_name">Hello,@ViewBag.Name</span>
+                    </li>
+                    <li class="sub-menu-parent nav-item dropdown" tab-index="0">
+                        <a href="@Url.Action("UserProfile","UserManager")">MyProfile<img src="~/Content/images/arrow_drop_down_black_24dp.svg" /></a>
+                        <ul class="sub-menu">
+                            <li>
+                                <a class="dropdown-item edit_user" value="@ViewBag.Id" data-toggle="modal" data-target="#exampleModalCenter" href="javascript:void(0)"><img src="~/Content/images/mode_black_24dp.svg" />Edit</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#"><img src="~/Content/images/settings_black_24dp.svg" />Setting</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#"><img src="~/Content/images/delete_black_24dp.svg" />Delete</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("LogOff", "Account")"><img src="~/Content/images/logout_black_24dp.svg" />LogOut</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Hover Table -->
+            <div class="block">
+                <div class="block-content">
+                    <div class="program-heading" style="margin:10px;">
+                        <div class="form-group col-md-7">
+                            <form class="d-flex">
+                                <input class="form-control me-2" id="search" type="search" placeholder="Search" aria-label="Search">
+                            </form>
+                            <div class="btn-group" style="margin-top:10px;">
+                                <button class="btn btn-primary all">All</button>
+                                <button class="btn btn-primary doctor" data-filter="doctor">Doctor</button>
+                                <button class="btn btn-primary engineer" data-filter="engineer">Engineer</button>
+                                <button class="btn btn-primary plumber" data-filter="plumber">Plumber</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-list">
+                        <hr style="margin-bottom: 0;">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="">#NO</th>
+                                    <th>Name</th>
+                                    <th>Occupation</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                    <th>Rating</th>
+                                    <th class="hidden-xs" style="">Status</th>
+                                    <th class="text-center" style="">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users" class="filter">
+                                @foreach (var item in Model.users)
+                                {
+                                    int sum = 0;
+                                    int j = 0;
+                                    if (item.RegisterAs == "Specialist")
+                                    {
+                                        foreach (var rate in Model.ratings)
+                                        {
+                                            if (rate.SpecialistId == item.Id)
+                                            {
+
+                                                sum = sum + rate.rating;
+                                                j++;
+
+                                            }
+                                        }
+                                        rated = Math.Ceiling((float)sum / j);
+                                        <tr>
+                                            <td class="text-center">@i</td>
+                                            <td>@item.Name</td>
+                                            <td id="occu" value="@item.occupation">@item.occupation</td>
+                                            <td>@item.City</td>
+                                            <td>@item.State</td>
+                                            <td class="rate-star" value="">
+                                                
+                                                @if (rated.ToString() != "NaN")
+                                                {
+                                                    for (int p = 0; p < rated; p++)
+                                                    {
+                                                        <a class="star checked" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    }
+                                                    for (int l = 0; l < (5 - rated); l++)
+                                                    {
+                                                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                                                }
+
+
+
+                                            </td>
+                                            <td>
+                                                @if (item.IsActive == true)
+                                                {
+                                                    <span class="label label-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-danger">In-active</span>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="padding: 12px 0px;">
+                                                <div class="btn-group">
+                                                    <button style="margin-left:2px;" specialist="@item.Id" sender="@ViewBag.Id" class="btn btn-primary specialist-modal tooltip-pop-up" data-toggle="modal" data-target="#specialistModal">Fix-Appointment</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        i += 1;
+
+                                    }
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- END Hover Table -->
+        </div>
+    </div>
+    @{ Html.RenderPartial("_specialistModal");}
+    <div class="loader-div"><div class="loader"></div></div>
+</body>
+</html>

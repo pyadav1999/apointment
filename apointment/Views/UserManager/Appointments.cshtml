@@ -1,0 +1,218 @@
+﻿@model IEnumerable<apointment.ViewModels.AppointmentViewModel>
+@{
+    ViewBag.Title = "Appointments";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    int i = 1;
+}
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(document).on("click", ".sendercancle", function () {
+            var apointid = $(this).attr("appointid");
+            debugger;
+            swal({
+                title: "Are you sure?",
+                text: "You want to cancle Appointment",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    debugger;
+                    if (willDelete) {
+                        $.ajax({
+                            url: '@Url.Action("CancleRequest", "UserManager")',
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            data: JSON.stringify({ Id: apointid }),
+                            success: function (result) {
+                                if (result.Status == true) {
+
+                                    swal(result.Message, {
+                                        icon: "success",
+                                    });
+                                    window.location.href = "@Url.Action("Appointments","UserManager")";
+                                }
+                                else {
+                                    swal(result.Message, { icon: "oops" });
+                                }
+                            },
+                        });
+
+                    } else {
+
+                    }
+                });
+        });
+
+        $(document).on("click", ".cancle", function () {
+            var apointid = $(this).attr("appointid");
+             swal({
+                title: "Are you sure?",
+                text: "You want to Decline Request",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    debugger;
+                    if (willDelete) {
+                        $.ajax({
+                            url: '@Url.Action("DeclineRequest", "UserManager")',
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            data: JSON.stringify({ Id: apointid }),
+                            success: function (result) {
+                                if (result.Status == true) {
+
+                                    swal(result.Message, {
+                                        icon: "success",
+                                    });
+                                        window.location.href = "@Url.Action("Appointments","UserManager")";
+                                }
+                                else {
+                                    swal(result.Message, { icon: "oops" });
+                                }
+                            },
+                        });
+
+                    } else {
+
+                    }
+                });
+        });
+        $(document).on("click", ".accept", function () {
+            var apointid = $(this).attr("appointid");
+             $.ajax({
+                            url: '@Url.Action("AcceptRequest", "UserManager")',
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            data: JSON.stringify({ Id: apointid }),
+                            success: function (result) {
+                                if (result.Status == true) {
+
+                                    swal(result.Message, {
+                                        icon: "success",
+                                    });
+                                    window.location.href = "@Url.Action("Next","UserManager")";
+                                }
+                                else {
+                                    swal(result.Message, { icon: "oops" });
+                                }
+                            },
+                  });
+        });
+    });
+</script>
+
+<div class="continer">
+    <div class="row" style="margin-top:2%;">
+        <div class="col-sm-12">
+            <div class="content" style=" /* align-items: center; */ text-align: center">
+                <h5>Pending Appontments</h5>
+                <div class="next-appointments" style="padding:10px">
+
+                    <div class="request" style="">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="">#NO</th>
+                                    <th>Name</th>
+                                    <th>Occupation</th>
+                                    <th>Address</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th class="text-center" style="">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users">
+                                @foreach (var item in Model)
+                                {
+                                    if (item.SenderId == ViewBag.userid)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@i</td>
+                                            <td>@item.specialistName</td>
+                                            <td>@item.occupation</td>
+                                            <td>@item.specialistAddress</td>
+                                            <td>@item.specialistcity</td>
+                                            <td>@item.specialistState</td>
+                                            <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.AppointmentTime.ToString("hh:mm tt")</td>
+                                            <td>
+                                                @if (item.IsActive == true)
+                                                {
+                                                    <span class="label label-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-Danger">Declined</span>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="padding: 12px 0px;">
+                                                <div class="btn-group">
+                                                    <a style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary sendercancle tooltip-pop-up">Cancle</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    }
+
+                                    if (item.SpecialistId == ViewBag.userid)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@i</td>
+                                            <td>@item.senderName</td>
+                                            <td>User</td>
+                                            <td>@item.senderAddess</td>
+                                            <td>@item.senderCity</td>
+                                            <td>@item.senderState</td>
+                                            <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.AppointmentTime.ToString("hh:mm tt")</td>
+                                            <td>
+                                                @if (item.IsActive == true)
+                                                {
+                                                    <span class="label label-success">Pending</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-Danger">Rejected</span>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="padding: 12px 0px;">
+                                                <div class="btn-group">
+                                                    @if (item.IsActive == true)
+                                                    {
+                                                        <a style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary accept tooltip-pop-up">Accept</a>
+                                                        <a style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary cancle tooltip-pop-up">Decline</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button disabled style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary accept tooltip-pop-up">Accept</button>
+                                                        <button disabled style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary cancle tooltip-pop-up">Decline</button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    i = i + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

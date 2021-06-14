@@ -1,0 +1,216 @@
+﻿@model IEnumerable<apointment.ViewModels.AppointmentViewModel>
+
+@{
+    ViewBag.Title = "Next";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    int i = 1;
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .checked {
+        color: orange;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var rateid=0;
+        $(document).on("mouseover", ".rate", function () {
+            $(this).addClass("checked");
+        });
+        $(document).on("mouseleave", ".rate", function () {
+            $(this).removeClass("checked");
+        });
+        $(document).on("click", ".star", function () {
+            debugger;
+            $(this).prevUntil("h4").css({ "color": "orange" });
+            $(this).addClass("checked")
+            rateid = $(this).attr('rating');
+        });
+        $(document).on("click", ".ratesubmit", function () {
+            debugger;
+
+            var apointid = $('.rating').attr("appointid");
+             $.ajax({
+                          url: '@Url.Action("Completed", "UserManager")',
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            data: JSON.stringify({Id:apointid }),
+                            success: function (result) {
+                                debugger;
+                                if (result.Status == true) {
+                                    debugger;
+                                    var send = $('.rating').attr("sender");
+                                    var spec = $('.rating').attr("specialist");
+                                    var model = new Object();
+                                    var txt = $('#review').val();
+                                    model.rating = rateid;
+                                    model.SenderId = send;
+                                    model.SpecialistId = spec;
+                                    model.review = txt;
+                                    model.appointid = apointid;
+                                    $.ajax({
+                                        url: '@Url.Action("Rating", "UserManager")',
+                                        type: "POST",
+                                        contentType: "application/json; charset=utf-8",
+                                        processData: false,
+                                        data: JSON.stringify({ model }),
+                                        success: function (result) {
+                                            if (result.Status == true) {
+                                                
+                                                window.location.href = "@Url.Action("Previous", "UserManager")";
+                                                swal(result.Message, { icon: "success" ,title:"Saved"});
+                                            }
+                                            else {
+
+                                                swal(result.Message, { icon: "oops" });
+                                            }
+                                        }
+                                    });
+
+
+                                }
+                                else {
+                                    swal(result.Message, { icon: "oops" });
+                                }
+                            },
+                  });
+    });
+    });
+</script>
+<div class="continer">
+    <div class="row" style="margin-top:2%;">
+        <div class="col-sm-12">
+            <div class="content" style=" /* align-items: center; */ text-align: center">
+                <h5>Next Appontments</h5>
+                <div class="next-appointments" style="padding:10px">
+
+                    <div class="request" style="">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="">#NO</th>
+                                    <th>Name</th>
+                                    <th>Occupation</th>
+                                    <th>Address</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th class="text-center" style="">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users">
+                                @foreach (var item in Model)
+                                {
+                                    if (item.SenderId == ViewBag.userid)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@i</td>
+                                            <td>@item.specialistName</td>
+                                            <td>@item.occupation</td>
+                                            <td>@item.specialistAddress</td>
+                                            <td>@item.specialistcity</td>
+                                            <td>@item.specialistState</td>
+                                            <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.AppointmentTime.ToString("hh:mm tt")</td>
+                                            <td>
+                                                @if (item.IsActive == true)
+                                                {
+                                                    <span class="label label-success">Fixed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-Danger">Declined</span>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="padding: 12px 0px;">
+                                                <div class="btn-group">
+                                                    <a style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary rating tooltip-pop-up" data-toggle="modal" data-target="#rating">Completed</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    }
+
+                                    if (item.SpecialistId == ViewBag.userid)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@i</td>
+                                            <td>@item.senderName</td>
+                                            <td>User</td>
+                                            <td>@item.senderAddess</td>
+                                            <td>@item.senderCity</td>
+                                            <td>@item.senderState</td>
+                                            <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.AppointmentTime.ToString("hh:mm tt")</td>
+                                            <td>
+                                                @if (item.IsActive == true)
+                                                {
+                                                    <span class="label label-success">Fixed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="label label-Danger">Rejected</span>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="padding: 12px 0px;">
+                                                <div class="btn-group">
+                                                    @if (item.IsActive == true)
+                                                    {
+                                                        <a style="margin-left:2px;" specialist="@item.SpecialistId" sender="@item.SenderId" appointid="@item.AppointId" class="btn btn-primary rating tooltip-pop-up" data-toggle="modal" data-target="#rating">Completed</a>
+                                                    }
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    i = i + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal fade" id="rating" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Give Feedback</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="rating-div">
+                    <h4>Rating</h4>
+                    <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                    <a class="star" rating="2"><span class="fa fa-star rate"></span></a>
+                    <a class="star" rating="3"><span class="fa fa-star rate"></span></a>
+                    <a class="star" rating="4"><span class="fa fa-star rate"></span></a>
+                    <a class="star" rating="5"><span class="fa fa-star rate"></span></a>
+                </div>
+                <div class="review">
+                    <h4>Review</h4>
+                    <textarea id="review"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary ratesubmit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>

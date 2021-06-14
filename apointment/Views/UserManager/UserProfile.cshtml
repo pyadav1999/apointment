@@ -1,0 +1,318 @@
+﻿@using apointment.Models
+@model dynamic
+@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+
+    .content {
+        box-shadow: 10px 10px 10px 10px lightgrey;
+        align-items: center;
+        border-radius: 5px;
+    }
+
+
+
+
+    .heading {
+        font-size: 25px;
+        margin-right: 25px;
+    }
+
+    .fa {
+        font-size: 25px;
+    }
+
+    .checked {
+        color: orange;
+    }
+
+    /* Three column layout */
+    .side {
+        float: left;
+        width: 15%;
+        margin-top: 10px;
+    }
+
+    .middle {
+        margin-top: 10px;
+        float: left;
+        width: 70%;
+    }
+
+    /* Place text to the right */
+    .right {
+        text-align: right;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    /* The bar container */
+    .bar-container {
+        width: 100%;
+        background-color: #f1f1f1;
+        text-align: center;
+        color: white;
+    }
+
+    /* Individual bars */
+    .bar-5 {
+       
+        height: 18px;
+        background-color: #04AA6D;
+    }
+
+    .bar-4 {
+       
+        height: 18px;
+        background-color: #2196F3;
+    }
+
+    .bar-3 {
+        height: 18px;
+        background-color: #00bcd4;
+    }
+
+    .bar-2 {
+       
+        height: 18px;
+        background-color: #ff9800;
+    }
+
+    .bar-1 {
+        height: 18px;
+        background-color: #f44336;
+    }
+
+    /* Responsive layout - make the columns stack on top of each other instead of next to each other */
+    @@media (max-width: 400px) {
+        .side, .middle {
+            width: 100%;
+        }
+
+        .right {
+            display: none;
+        }
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var total = $('.total-user').attr("value");
+        var bar1 = ($('.bar-1').attr("value") * 100) / total;
+        var bar2 = ($('.bar-2').attr("value") * 100) / total;
+        var bar3 = ($('.bar-3').attr("value") * 100) / total;
+        var bar4 = ($('.bar-4').attr("value") * 100) / total;
+        var bar5 = ($('.bar-5').attr("value") * 100) / total;
+        $('.bar-1').width(bar1 + '%');
+        $('.bar-2').width(bar2 + '%');
+        $('.bar-3').width(bar3 + '%');
+        $('.bar-4').width(bar4 + '%');
+        $('.bar-5').width(bar5 + '%');
+
+    });
+</script>
+@foreach (var item in Model.user)
+{
+    int sum = 0,a=0,b=0,c=0,d=0,e=0;
+    int j = 0;
+    double rated = 0;
+    <div class="container" style="width:60%;">
+        <div class="content">
+            <div class="profile">
+                <div class="avatar-upload">
+                    <div class="avatar-edit">
+                        @using (Html.BeginForm("uploadimg", "UserManager", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+                        {
+                            <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" name="file" />
+                            <label class="img-upload" for="imageUpload">
+                                <img style="margin:12%;" src="~/Content/images/mode_black_24dp.svg" />
+                            </label>
+                            <div class="submit-img" style=" top: 200%; position: absolute; margin-left: 40px;">
+                                <input type="submit" value="upload" class="btn btn-primary" />
+                            </div>
+                        }
+                    </div>
+                    <div class="avatar-preview">
+                        <div class="imgview" id="imagePreview" style=" background-image: url('../../Uploads/@item.imgurl');">
+                        </div>
+                    </div>
+                </div>
+                <div class="user_details">
+                    <div class="user_header" style="text-align:center;">
+                        <h4 style="color:#0065EC;">@item.Name</h4>
+                        @if (item.RegisterAs == "Specialist")
+                        {
+                            <h4>@item.occupation </h4>
+                        }
+                        <h5 style="color:#42C6FF;">@item.City,@item.State</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top:60px;">
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="block" style="padding:15px;box-shadow:5px 5px 5px 5px lightgray">
+                    <h4>My Account</h4>
+                    <div class="user-info">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input class="form-control" value="@item.Name" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input class="form-control" value="@item.Email" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input class="form-control" value="@item.Phone" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input class="form-control" value="@item.Address" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input class="form-control" value="@item.City" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input class="form-control" value="@item.State" disabled />
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-sm-7">
+
+                @foreach (var rate in Model.rating)
+                {
+                    if (rate.SenderId == item.Id || rate.SpecialistId == item.Id)
+                    {
+                        sum = sum + rate.rating;
+                        j++;
+                        if (rate.rating == 1)
+                        {
+                            a++;
+                        }
+                        else if (rate.rating == 2)
+                        { b++;
+                        }
+                        else if (rate.rating == 3)
+                        {
+                            c++;
+                        }
+                        else if (rate.rating == 4)
+                        {
+                            d++;
+                        }
+                        else if (rate.rating == 5)
+                        {
+                            e++;
+                        }
+
+                    }
+                    rated = Math.Ceiling((float)sum / j);
+                }
+
+                <div class="block" style="padding:15px;box-shadow:5px 5px 5px 5px lightgray">
+                    <span class="heading">Rating</span>
+                    @if (rated.ToString() != "NaN")
+                    {
+                        for (int p = 0; p < rated; p++)
+                        {
+                            <a class="star checked" rating="1"><span class="fa fa-star rate"></span></a>
+                        }
+                        for (int l = 0; l < (5 - rated); l++)
+                        {
+                            <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                        }
+                    }
+                    else
+                    {
+                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                        <a class="star" rating="1"><span class="fa fa-star rate"></span></a>
+                    }
+                    <p>@rated average based on @j reviews.</p>
+                    <hr style="border:3px solid #f1f1f1">
+
+                    <div class="row">
+                        <div value="@j" class="total-user" hidden></div>
+                        <div class="side">
+                            <div>5 star</div>
+                        </div>
+                        <div class="middle">
+                            <div class="bar-container">
+                                <div class="bar-5" value="@e"></div>
+                            </div>
+                        </div>
+                        <div class="side right">
+                            <div>@e</div>
+                        </div>
+                        <div class="side">
+                            <div>4 star</div>
+                        </div>
+                        <div class="middle">
+                            <div class="bar-container">
+                                <div class="bar-4" value="@d"></div>
+                            </div>
+                        </div>
+                        <div class="side right">
+                            <div>@d</div>
+                        </div>
+                        <div class="side">
+                            <div>3 star</div>
+                        </div>
+                        <div class="middle">
+                            <div class="bar-container">
+                                <div class="bar-3"  value="@c"></div>
+                            </div>
+                        </div>
+                        <div class="side right">
+                            <div>@c</div>
+                        </div>
+                        <div class="side">
+                            <div>2 star</div>
+                        </div>
+                        <div class="middle">
+                            <div class="bar-container">
+                                <div class="bar-2" value="@b"></div>
+                            </div>
+                        </div>
+                        <div class="side right">
+                            <div>@b</div>
+                        </div>
+                        <div class="side">
+                            <div>1 star</div>
+                        </div>
+                        <div class="middle">
+                            <div class="bar-container" >
+                                <div class="bar-1" value="@a"></div>
+                            </div>
+                        </div>
+                        <div class="side right">
+                            <div>@a</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+}
